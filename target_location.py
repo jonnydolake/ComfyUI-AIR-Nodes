@@ -344,6 +344,7 @@ class target_location_crop:
             "required": {
                 "images" :("IMAGE",),
                 "masks": ("IMAGE",),
+                "area_mode": ("BOOLEAN", {"default": False}),
                 "resolution_size": ("INT", {"default": 512, "min": 128, "max": 4096, "step": 64, "display": "number", "lazy": True}),
                 "mask_padding": ("INT", {"default": 12, "min": 0, "max": 128, "step": 1, "display": "number", "lazy": True}),
                 "invert_masks": ("BOOLEAN", { "default": False })
@@ -357,25 +358,48 @@ class target_location_crop:
 
     CATEGORY = "AIR Nodes"
 
-    def crop(self, images, masks, resolution_size, mask_padding, invert_masks):
+    def crop(self, images, masks, resolution_size, mask_padding, invert_masks, area_mode):
         padding = mask_padding
         size = resolution_size
 
         if invert_masks == True:
             masks = 1.0 - masks
 
-        #mask_list = batch_to_list(masks)
-
         black_square = create_black(size, size)
         white_square = create_white(size, size)
 
         converted_masks = image_to_mask(masks)
 
-        #print(converted_masks)
+        if area_mode:
+            cropped_images = []
+            cropped_images_scaled = []
+            cropped_masks = []
+            cropped_masks_scaled = []
+            top = []
+            left = []
+            right = []
+            bottom = []
 
-        #mask_list = mask_to_list(converted_masks)
-        #print(mask_list)
+            for x in range(len(converted_masks)):
+                x_cropped_mask, x_top, x_left, x_right, x_bottom = mask_crop_region(converted_masks[x], padding)
+                top.append(x_top)
+                left.append(x_left)
+                right.append(x_right)
+                bottom.append(x_bottom)
 
+            for x in range(len(images)):
+                cropped_image = image_crop_location(images[x], min(top), min(left), max(right), max(bottom))
+                cropped_images.append(cropped_image)
+                cropped_images_scaled.append(upscale(cropped_image, size))
+
+            for x in range(len(masks)):
+                cropped_mask = image_crop_location(masks[x], min(top), min(left), max(right), max(bottom))
+                cropped_masks.append(cropped_mask)
+                cropped_masks_scaled.append(upscale(cropped_mask, size))
+
+            coordinates = (images, cropped_images, cropped_masks, min(top), min(left), max(right), max(bottom), area_mode)
+
+            return (list_to_batch(cropped_images_scaled), image_to_mask(list_to_batch(cropped_masks_scaled)), coordinates)
 
         output_images = []
         cropped_images = []
@@ -400,9 +424,7 @@ class target_location_crop:
             cropped_masks_scaled.append(composite_masked(black_square, upscale(mask_to_image(x_cropped_mask), size)))
             output_images.append(composite_masked(white_square,upscale(cropped_image, size)))
 
-        coordinates = (images, cropped_images_scaled, cropped_images, cropped_masks, top, left, right, bottom)
-        #print(coordinates)
-
+        coordinates = (images, cropped_images_scaled, cropped_images, cropped_masks, top, left, right, bottom, output_images, area_mode)
 
         return (list_to_batch(output_images), image_to_mask(list_to_batch(cropped_masks_scaled)), coordinates)
 
@@ -418,9 +440,6 @@ class target_location_paste:
                 #"masks": ("MASK",)
                 "crop_data": ("*", {"forceInput": True}),
                 "apply_masks": ("BOOLEAN", {"default": True})
-            },
-            "optional": {
-                "upscale_model": ("UPSCALE_MODEL",)
             }
         }
 
@@ -431,13 +450,55 @@ class target_location_paste:
 
     CATEGORY = "AIR Nodes"
 
-    def paste(self, cropped_images, crop_data, apply_masks, upscale_model=None):
+    def paste(self, cropped_images, crop_data, apply_masks):
+
+        area_mode = crop_data[-1]
+
+        if area_mode:
+            original_images = batch_to_list(crop_data[0])
+            new_cropped_images = batch_to_list(cropped_images)
+            original_cropped_images = crop_data[1]
+            cropped_masks = crop_data[2]
+
+            top = crop_data[3]
+            left = crop_data[4]
+            right = crop_data[5]
+            bottom = crop_data[6]
+
+            image_list = []
+
+            for x in range(len(new_cropped_images)):
+                if new_cropped_images[x].size() > original_cropped_images[x].size() or new_cropped_images[x].size() < original_cropped_images[x].size():
+                    image_size = original_cropped_images[x].size()
+                    image_width = int(image_size[2])
+                    image_height = int(image_size[1])
+
+                    temp1 = new_cropped_images[x]
+
+                    samples = temp1.movedim(-1, 1)
+                    temp_image = common_upscale(samples, image_width, image_height, "lanczos", "disabled")
+                    temp_image = temp_image.movedim(1, -1)
+                else:
+                    temp_image = new_cropped_images[x]
+
+                if apply_masks and len(new_cropped_images) == len(cropped_masks):
+                    temp_image = composite_masked(original_cropped_images[x], temp_image, mask=image_to_mask(cropped_masks[x]))
+                elif apply_masks and len(new_cropped_images) != len(cropped_masks):
+                    raise AttributeError(
+                        f"Image size is {str(len(new_cropped_images))} while Mask size is {str(len(cropped_masks))}! \n Either match the Image size and Mask size or set 'apply_masks' to False!")
+
+                image_list_rgba = image_paste_crop_location(original_images[x], temp_image, top, left, right, bottom)
+
+                image_list.append(image_to_rgb(image_list_rgba))
+
+            return (list_to_batch(image_list),)
 
         original_images = batch_to_list(crop_data[0])
         images= batch_to_list(cropped_images)
         cropped_images_scaled = crop_data[1]
         cropped_image_list = crop_data[2]
         cropped_masks = crop_data[3]
+        original_output_images = crop_data[8]
 
         top = crop_data[4]
         left = crop_data[5]
@@ -447,11 +508,19 @@ class target_location_paste:
         image_list= []
 
         for x in range(len(images)):
+            if original_output_images[x].size() < images[x].size() or original_output_images[x].size() > images[x].size():
+                image_size = images[x].size()
+                image_width = int(image_size[2])
+
+                temp_image_list_resized = upscale(cropped_images_scaled[x], image_width)
+
+                new_image_list = composite_masked(temp_image_list_resized, images[x])
+            else:
+                new_image_list = composite_masked(cropped_images_scaled[x], images[x])
+
             image_size = cropped_image_list[x].size()
             image_width = int(image_size[2])
             image_height = int(image_size[1])
-
-            new_image_list = composite_masked(cropped_images_scaled[x], images[x])
 
             samples = new_image_list.movedim(-1, 1)
             new_image_list_resized = common_upscale(samples, image_width, image_height, "lanczos", "disabled")
