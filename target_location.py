@@ -459,17 +459,20 @@ class target_location_paste:
             new_cropped_images = batch_to_list(cropped_images)
             original_cropped_images = crop_data[1]
             cropped_masks = crop_data[2]
+            original_image_size = original_images[0].size()
+            original_empty_image = create_white(int(original_image_size[2]), int(original_image_size[1]))
 
             top = crop_data[3]
             left = crop_data[4]
             right = crop_data[5]
             bottom = crop_data[6]
 
+
             image_list = []
 
             for x in range(len(new_cropped_images)):
-                if new_cropped_images[x].size() > original_cropped_images[x].size() or new_cropped_images[x].size() < original_cropped_images[x].size():
-                    image_size = original_cropped_images[x].size()
+                if new_cropped_images[x].size() > original_cropped_images[0].size() or new_cropped_images[x].size() < original_cropped_images[0].size():
+                    image_size = original_cropped_images[0].size()
                     image_width = int(image_size[2])
                     image_height = int(image_size[1])
 
@@ -487,7 +490,14 @@ class target_location_paste:
                     raise AttributeError(
                         f"Image size is {str(len(new_cropped_images))} while Mask size is {str(len(cropped_masks))}! \n Either match the Image size and Mask size or set 'apply_masks' to False!")
 
-                image_list_rgba = image_paste_crop_location(original_images[x], temp_image, top, left, right, bottom)
+                if len(new_cropped_images) == len(cropped_masks):
+                    print("YES")
+                    image_list_rgba = image_paste_crop_location(original_images[x], temp_image, top, left, right, bottom)
+                else:
+                    if x == 0:
+                        print("\033[31mNOTE: Your cropped images will get pasted on an empty image because their count exceeds the count of the original batch!\033[0m")
+
+                    image_list_rgba = image_paste_crop_location(original_empty_image, temp_image, top, left, right, bottom)
 
                 image_list.append(image_to_rgb(image_list_rgba))
 
