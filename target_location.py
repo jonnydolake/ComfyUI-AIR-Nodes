@@ -558,6 +558,7 @@ class image_composite_chained:
                 "main_destination" :("IMAGE", ),
                 "sources": ("IMAGE", ),
                 "masks": ("MASK", ),
+                "resize_sources": ("BOOLEAN", {"default": False}),
             }
         }
 
@@ -568,14 +569,14 @@ class image_composite_chained:
 
     CATEGORY = "AIR Nodes"
 
-    def run(self, main_destination, sources, masks):
+    def run(self, main_destination, sources, masks, resize_sources):
 
         composited_image = main_destination
         source_list = batch_to_list(sources)
         mask_list = mask_to_list(masks)
 
         for x in range(len(source_list)):
-            composited_image = composite_masked(composited_image, source_list[x], mask=mask_list[x])
+            composited_image = composite_masked(composited_image, source_list[x], resize_source=resize_sources, mask=mask_list[x])
 
         return (composited_image,)
 
