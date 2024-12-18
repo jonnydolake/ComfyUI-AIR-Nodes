@@ -547,13 +547,46 @@ class target_location_paste:
         return (list_to_batch(image_list),)
 
 
+class image_composite_chained:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "main_destination" :("IMAGE", ),
+                "sources": ("IMAGE", ),
+                "masks": ("MASK", ),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("images",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "AIR Nodes"
+
+    def run(self, main_destination, sources, masks):
+
+        composited_image = main_destination
+        source_list = batch_to_list(sources)
+        mask_list = mask_to_list(masks)
+
+        for x in range(len(source_list)):
+            composited_image = composite_masked(composited_image, source_list[x], mask=mask_list[x])
+
+        return (composited_image,)
 
 NODE_CLASS_MAPPINGS = {
     "TargetLocationCrop": target_location_crop,
     "TargetLocationPaste": target_location_paste,
+    "ImageCompositeChained": image_composite_chained,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "TargetLocationCrop": "Target Location (Crop)",
     "TargetLocationPaste": "Target Location (Paste)",
+    "ImageCompositeChained": "Image Composite Chained",
 }

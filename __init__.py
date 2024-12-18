@@ -1,12 +1,15 @@
 from .force_minimum_batch_size import *
 from .string_list_to_prompt_schedule import *
 from .target_location import *
+from .match_image_count_to_mask_count import *
 
 NODE_CLASS_MAPPINGS = {
     "string_list_to_prompt_schedule": string_list_to_prompt_schedule,
     "ForceMinimumBatchSize": minimum_batch_size,
     "TargetLocationCrop": target_location_crop,
     "TargetLocationPaste": target_location_paste,
+    "ImageCompositeChained": image_composite_chained,
+    "MatchImageCountToMaskCount": match_image_count_to_mask_count,
 
 }
 
@@ -15,6 +18,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ForceMinimumBatchSize": "Force Minimum Batch Size",
     "TargetLocationCrop": "Target Location (Crop)",
     "TargetLocationPaste": "Target Location (Paste)",
+    "ImageCompositeChained": "Image Composite Chained",
+    "MatchImageCountToMaskCount": "Match Image Count To Mask Count",
+
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
