@@ -27,7 +27,7 @@ class random_character_prompts:
         materials = ["denim ", "leather ", "velvet ", "rugged ", "fur ", "polyester ", "metal ", "gold ", "", "gel ", "", "", ""]
         #girl_shirts = ["hoodie ", "shirt ", "top ", "dress ", "jacket ", "cardigan ", "blouse ", "sweater ", "tunic ", "t-shirt ", "camisole ", "polo ", "shirt dress ", "dress ", "blazer ", "raincoat ", "coat "]
         #girl_pants = ["shorts ", "long skirt ", "skirt ", "baggy pants ", "leggings ", "pants ", "thigh highs ", "stockings ", "pants ", "dress ", "armor "]
-        hair_length = ["long ", "short ", "neck legth ", "very long ", "very short", "medium"]
+        hair_length = ["long ", "short ", "neck length ", "very long ", "very short ", "medium ", ""]
         hair_type = ["curly ", "straight ", "messy ", "tidy ", "wavy ", "braided ", "twintails ", "ponytail ", ""]
         shoes = ["sandals ", "sneakers ", "shoes ", "boots ", "loafers ", "flip-flops ", "heels ", "cowboy boots ", "slippers "]
         hand_acc = ["fingerless gloves ", "watch ", "bracelet ", "boxing gloves ", "watch ", "bracelet ", "gloves ", "ring "]
