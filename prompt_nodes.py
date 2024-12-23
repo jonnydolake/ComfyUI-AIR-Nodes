@@ -13,8 +13,8 @@ class random_character_prompts:
             }
         }
 
-    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "STRING")
-    RETURN_NAMES = ("HAIR", "FACE", "TORSO", "HANDS", "LEGS", "FEET")
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "INT")
+    RETURN_NAMES = ("HAIR", "FACE", "TORSO", "HANDS", "LEGS", "FEET", "seed")
 
     FUNCTION = "run"
 
@@ -46,7 +46,7 @@ class random_character_prompts:
             legs = colors[random.randint(0, len(colors)-1)] + materials[random.randint(0, len(materials)-1)] + girl_pants[random.randint(0, len(girl_pants)-1)]
             torso = colors[random.randint(0, len(colors)-1)] + materials[random.randint(0, len(materials)-1)] + girl_shirts[random.randint(0, len(girl_shirts)-1)]
 
-            return (hair, face, torso, hands, legs, feet)
+            return (hair, face, torso, hands, legs, feet, seed)
 
         elif character_type == "boy":
             hair = ""
@@ -56,7 +56,7 @@ class random_character_prompts:
             legs = ""
             feet = ""
 
-            return (hair, face, torso, hands, legs, feet)
+            return (hair, face, torso, hands, legs, feet, seed)
 
 
 
