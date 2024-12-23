@@ -1,33 +1,49 @@
 import random
 
+def get_random_element(list):
+    random_element = list[random.randint(0, len(list) - 1)]
+    return random_element
+
 class random_character_prompts:
-    def __init__(self):
-        pass
 
     @classmethod
     def INPUT_TYPES(s):
         return {
             "required": {
-                "character_type": (["girl", "boy"],),
                 "seed": ("INT", {"default": random.randint(0, 0xffffffffffffffff), "min": 0, "max": 0xffffffffffffffff}),
-            }
+                "character_type": (["girl", "boy"],),
+                "hair_prompt": ("STRING", {"multiline": True,}),
+                "randomize_hair": ("BOOLEAN", {"default": False}),
+                "face_prompt": ("STRING", {"multiline": True,}),
+                "randomize_face": ("BOOLEAN", {"default": False}),
+                "torso_prompt": ("STRING", {"multiline": True,}),
+                "randomize_torso": ("BOOLEAN", {"default": False}),
+                "hands_prompt": ("STRING", {"multiline": True,}),
+                "randomize_hands": ("BOOLEAN", {"default": False}),
+                "legs_prompt": ("STRING", {"multiline": True,}),
+                "randomize_legs": ("BOOLEAN", {"default": False}),
+                "feet_prompt": ("STRING", {"multiline": True,}),
+                "randomize_feet": ("BOOLEAN", {"default": False}),
+            },
         }
 
-    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "INT")
-    RETURN_NAMES = ("HAIR", "FACE", "TORSO", "HANDS", "LEGS", "FEET", "seed")
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "STRING")
+    RETURN_NAMES = ("HAIR", "FACE", "TORSO", "HANDS", "LEGS", "FEET")
+    OUTPUT_NODE = True
 
     FUNCTION = "run"
 
     CATEGORY = "AIR Nodes"
 
-    def run(self, character_type, seed):
+    def run(self, character_type, seed, hair_prompt, randomize_hair, face_prompt, randomize_face, torso_prompt, randomize_torso, hands_prompt, randomize_hands, legs_prompt, randomize_legs, feet_prompt, randomize_feet, unique_id=None, extra_pnginfo=None):
         random.seed(seed)
+
 
         colors = ["blue ", "yellow ", "red ", "green ", "purple ", "black ", "white ", "silver ", "golden ", "brown ", "hazel ", "ruby ", "gray ", "orange ", "pink "]
         materials = ["denim ", "leather ", "velvet ", "rugged ", "fur ", "polyester ", "metal ", "gold ", "", "gel ", "", "", ""]
         #girl_shirts = ["hoodie ", "shirt ", "top ", "dress ", "jacket ", "cardigan ", "blouse ", "sweater ", "tunic ", "t-shirt ", "camisole ", "polo ", "shirt dress ", "dress ", "blazer ", "raincoat ", "coat "]
         #girl_pants = ["shorts ", "long skirt ", "skirt ", "baggy pants ", "leggings ", "pants ", "thigh highs ", "stockings ", "pants ", "dress ", "armor "]
-        hair_length = ["long ", "short ", "neck length ", "very long ", "very short ", "medium ", ""]
+        hair_length = ["long ", "short ", "very long ", "very short ", "medium ", ""]
         hair_type = ["curly ", "straight ", "messy ", "tidy ", "wavy ", "braided ", "twintails ", "ponytail ", ""]
         shoes = ["sandals ", "sneakers ", "shoes ", "boots ", "loafers ", "flip-flops ", "heels ", "cowboy boots ", "slippers "]
         hand_acc = ["fingerless gloves ", "watch ", "bracelet ", "boxing gloves ", "watch ", "bracelet ", "gloves ", "ring "]
@@ -35,19 +51,41 @@ class random_character_prompts:
         expressions = ["smiling ", "curious ", "shy ", "inquisitive ", "slightly angry ", "neutral expression ", "scared ", "sad ", "happy ", "innocent "]
 
         if character_type == "girl":
+            if randomize_hair:
+                hair = get_random_element(colors) + get_random_element(hair_length) + get_random_element(hair_type) + "hair"
+            else:
+                hair = hair_prompt
 
-            girl_shirts = ["hoodie ", "shirt ", "top ", "dress ", "jacket ", "cardigan ", "blouse ", "sweater ", "tunic ", "t-shirt ", "camisole ",
-                           "polo ", "shirt dress ", "dress ", "blazer ", "raincoat ", "coat "]
-            girl_pants = ["shorts ", "long skirt ", "skirt ", "baggy pants ", "leggings ", "pants ", "thigh highs ", "stockings ", "pants ", "dress ", "armor "]
+            if randomize_face:
+                face = get_random_element(colors) + get_random_element(eye_types) + "eyes, " + get_random_element(expressions)
+            else:
+                face = face_prompt
 
-            hair = colors[random.randint(0, len(colors) - 1)] + hair_length[random.randint(0, len(hair_length) - 1)] + hair_type[random.randint(0, len(hair_type) - 1)] + "hair"
-            face = colors[random.randint(0, len(colors)-1)] + eye_types[random.randint(0, len(eye_types)-1)] + "eyes, " + expressions[random.randint(0, len(expressions)-1)]
-            hands = colors[random.randint(0, len(colors)-1)] + materials[random.randint(0, len(materials)-1)] + hand_acc[random.randint(0, len(hand_acc)-1)]
-            feet = colors[random.randint(0, len(colors)-1)] + materials[random.randint(0, len(materials)-1)] + shoes[random.randint(0, len(shoes)-1)]
-            legs = colors[random.randint(0, len(colors)-1)] + materials[random.randint(0, len(materials)-1)] + girl_pants[random.randint(0, len(girl_pants)-1)]
-            torso = colors[random.randint(0, len(colors)-1)] + materials[random.randint(0, len(materials)-1)] + girl_shirts[random.randint(0, len(girl_shirts)-1)]
+            if randomize_torso:
+                girl_shirts = ["hoodie ", "shirt ", "top ", "dress ", "jacket ", "cardigan ", "blouse ", "sweater ","tunic ", "t-shirt ", "camisole ","polo ", "shirt dress ", "dress ", "blazer ", "raincoat ", "coat "]
+                torso = get_random_element(colors) + get_random_element(materials) + get_random_element(girl_shirts)
+            else:
+                torso = torso_prompt
+
+            if randomize_hands:
+                hands = get_random_element(colors) + get_random_element(materials) + get_random_element(hand_acc)
+            else:
+                hands = hands_prompt
+
+            if randomize_legs:
+                girl_pants = ["shorts ", "long skirt ", "skirt ", "baggy pants ", "leggings ", "pants ", "thigh highs ", "stockings ", "pants ", "dress ", "armor "]
+                legs = get_random_element(colors) + get_random_element(materials) + get_random_element(girl_pants)
+            else:
+                legs = legs_prompt
+
+            if randomize_feet:
+                feet = get_random_element(colors) + get_random_element(materials) + get_random_element(shoes)
+            else:
+                feet = feet_prompt
+
 
             return (hair, face, torso, hands, legs, feet, seed)
+            #return {"ui": {"hair_prompt": hair}, "result": (hair, face, torso, hands, legs, feet)}
 
         elif character_type == "boy":
             hair = ""
@@ -57,7 +95,8 @@ class random_character_prompts:
             legs = ""
             feet = ""
 
-            return (hair, face, torso, hands, legs, feet, seed)
+            return (hair, face, torso, hands, legs, feet)
+
 
 
 
