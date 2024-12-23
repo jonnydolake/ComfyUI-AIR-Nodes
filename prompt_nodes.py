@@ -27,7 +27,8 @@ class random_character_prompts:
         materials = ["denim ", "leather ", "velvet ", "rugged ", "fur ", "polyester ", "metal ", "gold ", "", "gel ", "", "", ""]
         #girl_shirts = ["hoodie ", "shirt ", "top ", "dress ", "jacket ", "cardigan ", "blouse ", "sweater ", "tunic ", "t-shirt ", "camisole ", "polo ", "shirt dress ", "dress ", "blazer ", "raincoat ", "coat "]
         #girl_pants = ["shorts ", "long skirt ", "skirt ", "baggy pants ", "leggings ", "pants ", "thigh highs ", "stockings ", "pants ", "dress ", "armor "]
-        hair_type = ["curly ", "straight ", "messy ", "tidy ", "wavy ", "braided "]
+        hair_length = ["long ", "short ", "neck legth ", "very long ", "very short", "medium"]
+        hair_type = ["curly ", "straight ", "messy ", "tidy ", "wavy ", "braided ", "twintails ", "ponytail ", ""]
         shoes = ["sandals ", "sneakers ", "shoes ", "boots ", "loafers ", "flip-flops ", "heels ", "cowboy boots ", "slippers "]
         hand_acc = ["fingerless gloves ", "watch ", "bracelet ", "boxing gloves ", "watch ", "bracelet ", "gloves ", "ring "]
         eye_types = ["tsundere ", "yandere ", "kind ", "soft ", "sharp ", "round, ", "cat ", "frog ", "happy ", "motherly ", "pretty "]
@@ -39,7 +40,7 @@ class random_character_prompts:
                            "polo ", "shirt dress ", "dress ", "blazer ", "raincoat ", "coat "]
             girl_pants = ["shorts ", "long skirt ", "skirt ", "baggy pants ", "leggings ", "pants ", "thigh highs ", "stockings ", "pants ", "dress ", "armor "]
 
-            hair = colors[random.randint(0, len(colors) - 1)] + hair_type[random.randint(0, len(hair_type) - 1)] + "hair"
+            hair = colors[random.randint(0, len(colors) - 1)] + hair_length[random.randint(0, len(hair_length) - 1)] + hair_type[random.randint(0, len(hair_type) - 1)] + "hair"
             face = colors[random.randint(0, len(colors)-1)] + eye_types[random.randint(0, len(eye_types)-1)] + "eyes, " + expressions[random.randint(0, len(expressions)-1)]
             hands = colors[random.randint(0, len(colors)-1)] + materials[random.randint(0, len(materials)-1)] + hand_acc[random.randint(0, len(hand_acc)-1)]
             feet = colors[random.randint(0, len(colors)-1)] + materials[random.randint(0, len(materials)-1)] + shoes[random.randint(0, len(shoes)-1)]
