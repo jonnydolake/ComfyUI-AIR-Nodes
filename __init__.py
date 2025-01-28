@@ -3,6 +3,7 @@ from .prompt_nodes import *
 from .target_location import *
 from .match_image_count_to_mask_count import *
 from .paralax_test import *
+from .paralax_gpu_test import *
 
 NODE_CLASS_MAPPINGS = {
     "string_list_to_prompt_schedule": string_list_to_prompt_schedule,
@@ -13,6 +14,8 @@ NODE_CLASS_MAPPINGS = {
     "MatchImageCountToMaskCount": match_image_count_to_mask_count,
     "RandomCharacterPrompts": random_character_prompts,
     "ParallaxTest": parallax_test,
+    "easy_parallax": easy_parallax,
+    "ParallaxGPUTest": ParallaxGPUTest,
 
 }
 
@@ -24,7 +27,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageCompositeChained": "Image Composite Chained",
     "MatchImageCountToMaskCount": "Match Image Count To Mask Count",
     "RandomCharacterPrompts": "Random Character Prompts",
-"ParallaxTest": "Parallax Test",
+    "ParallaxTest": "Parallax Test",
+    "EasyParallax": "Easy Parallax",
+    "ParallaxGPUTest": "Parallax GPU Test",
+
 
 }
 
