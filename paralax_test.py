@@ -36,7 +36,7 @@ class parallax_test:
                 "frames": ("INT", {"default": 10, "min": 1, "max": 99999, "step": 1}),
                 "x": ("INT", {"default": 0, "min": -99999, "max": 99999, "step": 1}),
                 "y": ("INT", {"default": 0, "min": -99999, "max": 99999, "step": 1}),
-                "scale": ("FLOAT", {"default": 1, "min": 0.01, "max": 100, "step": 0.01}),
+                "scale": ("FLOAT", {"default": 1, "min": 0.010, "max": 100, "step": 0.001}),
                 "aspect_ratio": ("FLOAT", {"default": 1, "min": 0.01, "max": 100, "step": 0.01}),
 
             },
@@ -62,8 +62,10 @@ class parallax_test:
 
         temp_x = 0
         temp_y = 0
+        temp_scale = 1.00
         prlx_x = 0
         prlx_y = 0
+        prlx_scale = 0.00
 
         for l in image:
             temp_img_list = []
@@ -81,6 +83,7 @@ class parallax_test:
         for img in l_images:
             temp_x += prlx_x
             temp_y += prlx_y
+            temp_scale += prlx_scale
 
             ret_images = []
             ret_masks = []
@@ -89,6 +92,7 @@ class parallax_test:
                 if i == 0:
                     temp_x = 0
                     temp_y = 0
+                    temp_scale = 1.00
 
                 layer_image = img[i] if i < len(img) else img[-1]
                 _image = tensor2pil(layer_image).convert('RGB')
@@ -101,8 +105,8 @@ class parallax_test:
                 _mask_canvas = Image.new('L', size=_mask.size, color='black')
                 orig_layer_width = _image.width
                 orig_layer_height = _image.height
-                target_layer_width = int(orig_layer_width * scale)
-                target_layer_height = int(orig_layer_height * scale * aspect_ratio)
+                target_layer_width = int(orig_layer_width * temp_scale)
+                target_layer_height = int(orig_layer_height * temp_scale * aspect_ratio)
 
                 # scale
                 _image = _image.resize((target_layer_width, target_layer_height))
@@ -122,6 +126,7 @@ class parallax_test:
 
                 temp_x += x + prlx_x
                 temp_y += y + prlx_y
+                temp_scale += scale - 1 + prlx_scale
 
                 #ret_images.append(pil2tensor(_image_canvas))
 
@@ -160,9 +165,11 @@ class parallax_test:
 
             prlx_x += x
             prlx_y += y
+            prlx_scale += scale - 1
 
             temp_x = 0
             temp_y = 0
+            temp_scale = 0
 
         print(comp_images)
         return (torch.cat(comp_images, dim=0),)
