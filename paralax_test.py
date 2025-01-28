@@ -338,5 +338,5 @@ NODE_CLASS_MAPPINGS = {
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "ParallaxTest": "Parallax Test",
-    "EasyParallax": "Easy Parallax",
+    "easy_parallax": "Easy Parallax",
 }

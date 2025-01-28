@@ -95,7 +95,6 @@ class ParallaxGPUTest:
 
 NODE_CLASS_MAPPINGS = {
     "ParallaxGPUTest": ParallaxGPUTest,
-    "easy_parallax": easy_parallax,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

@@ -28,7 +28,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "MatchImageCountToMaskCount": "Match Image Count To Mask Count",
     "RandomCharacterPrompts": "Random Character Prompts",
     "ParallaxTest": "Parallax Test",
-    "EasyParallax": "Easy Parallax",
+    "easy_parallax": "Easy Parallax",
     "ParallaxGPUTest": "Parallax GPU Test",
 
 
