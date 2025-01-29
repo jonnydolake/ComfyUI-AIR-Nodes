@@ -1,11 +1,15 @@
 import torch
-import copy
+import math
 from PIL import Image
 from .target_location import tensor2pil, pil2tensor
 
 def RGB2RGBA(image: Image, mask: Image) -> Image:
     (R, G, B) = image.convert('RGB').split()
     return Image.merge('RGBA', (R, G, B, mask.convert('L')))
+
+def reverseimagebatch(images):
+    reversed_images = torch.flip(images, [0])
+    return (reversed_images, )
 
 
 class parallax_test:
@@ -23,6 +27,8 @@ class parallax_test:
                 "y": ("INT", {"default": 0, "min": -99999, "max": 99999, "step": 1}),
                 "zoom": ("FLOAT", {"default": 1, "min": 0.010, "max": 100, "step": 0.001}),
                 "aspect_ratio": ("FLOAT", {"default": 1, "min": 0.01, "max": 100, "step": 0.01}),
+                "parallax_strength": ("FLOAT", {"default": 0.50, "min": 0.01, "max": 1.00, "step": 0.01}),
+                "static_background": ("BOOLEAN", { "default": False }),
             },
             "optional": {},
         }
@@ -32,7 +38,8 @@ class parallax_test:
     FUNCTION = 'layer_image_transform'
     CATEGORY = 'AIR Nodes'
 
-    def layer_image_transform(self, image, frames, x, y, zoom, aspect_ratio):
+    def layer_image_transform(self, image, frames, x, y, zoom, aspect_ratio, parallax_strength, static_background):
+
         l_images = []
         l_masks = []
         prev_comp_images = []
@@ -68,6 +75,11 @@ class parallax_test:
             ret_masks = []
 
             for i in range(len(img)):
+                if mask_count == 0 and static_background:
+                    temp_x = 0
+                    temp_y = 0
+                    temp_zoom = 1.00
+
                 if i == 0:
                     temp_x = 0
                     temp_y = 0
@@ -126,11 +138,18 @@ class parallax_test:
 
                 prev_comp_images = comp_images
 
+            if mask_count == 0 and static_background:
+                mask_count += 1
+                temp_x = 0
+                temp_y = 0
+                temp_zoom = 0
+                continue
+
             mask_count += 1
 
-            prlx_x += x
-            prlx_y += y
-            prlx_zoom += zoom - 1
+            prlx_x += math.ceil(x*parallax_strength)
+            prlx_y += math.ceil(y*parallax_strength)
+            prlx_zoom += (zoom-1)*parallax_strength
 
             temp_x = 0
             temp_y = 0
@@ -145,16 +164,18 @@ class easy_parallax:
 
     @classmethod
     def INPUT_TYPES(self):
-        vertical_options = ['None', 'Pan Center -> Up', 'Pan Center -> Down']
-        horizontal_options = ['None', 'Pan Center -> Left', 'Pan Center -> Right']
+        vertical_options = ['None', 'Pan Up', 'Pan Down']
+        horizontal_options = ['None', 'Pan Left', 'Pan Right']
         zoom_options = ['None', 'Zoom In', 'Zoom Out']
         return {
             "required": {
                 "image": ("IMAGE",),
-                "frames": ("INT", {"default": 10, "min": 1, "max": 99999, "step": 1}),
-                "vertical_pan": (vertical_options,),
+                #"frames": ("INT", {"default": 10, "min": 1, "max": 99999, "step": 1}),
+                "vertical_pan": (vertical_options, {"default": 'Pan Up'}),
                 "horizontal_pan": (horizontal_options,),
-                "zoom": (zoom_options,),
+                "camera_zoom": (zoom_options, ),
+                "parallax_strength": ("FLOAT", {"default": 0.50, "min": 0.01, "max": 1.00, "step": 0.01}),
+                "keep_background_static": ("BOOLEAN", {"default": False}),
 
             },
             "optional": {
@@ -166,7 +187,34 @@ class easy_parallax:
     FUNCTION = 'parallax_transform'
     CATEGORY = 'AIR Nodes'
 
-    def parallax_transform(self, image, frames, vertical_pan, horizontal_pan, zoom, aspect_ratio):
+    def parallax_transform(self, image, vertical_pan, horizontal_pan, camera_zoom, parallax_strength, keep_background_static):
+
+        #set up
+        frames = 25
+        if vertical_pan == "None":
+            y = 0
+        elif vertical_pan == "Pan Up":
+            y = 10
+        elif vertical_pan == "Pan Down":
+            y = -10
+
+        if horizontal_pan == "None":
+            x = 0
+        elif horizontal_pan == "Pan Left":
+            x = 10
+        elif horizontal_pan == "Pan Right":
+            x = -10
+
+        if camera_zoom == "None":
+            zoom = 1.00
+        elif camera_zoom == "Zoom In":
+            zoom = 1.020
+        elif camera_zoom == "Zoom Out":
+            x *= -1
+            y *= -1
+            zoom = 1.020
+
+
         l_images = []
         l_masks = []
         prev_comp_images = []
@@ -180,6 +228,7 @@ class easy_parallax:
         prlx_x = 0
         prlx_y = 0
         prlx_zoom = 0.00
+        aspect_ratio = 1.00
 
         # Convert input images to lists of layers and masks
         for l in image:
@@ -202,6 +251,11 @@ class easy_parallax:
             ret_masks = []
 
             for i in range(len(img)):
+                if mask_count == 0 and keep_background_static:
+                    temp_x = 0
+                    temp_y = 0
+                    temp_zoom = 1.00
+
                 if i == 0:
                     temp_x = 0
                     temp_y = 0
@@ -260,17 +314,28 @@ class easy_parallax:
 
                 prev_comp_images = comp_images
 
+            if mask_count == 0 and keep_background_static:
+                mask_count += 1
+                temp_x = 0
+                temp_y = 0
+                temp_zoom = 0
+                continue
+
             mask_count += 1
 
-            prlx_x += x
-            prlx_y += y
-            prlx_zoom += zoom - 1
+            prlx_x += math.ceil(x * parallax_strength)
+            prlx_y += math.ceil(y * parallax_strength)
+            prlx_zoom += (zoom - 1) * parallax_strength
 
             temp_x = 0
             temp_y = 0
             temp_zoom = 0
 
-        return (torch.cat(comp_images, dim=0),)
+        if camera_zoom == "Zoom Out":
+            return (torch.cat(comp_images, dim=0),)
+        else:
+            return (torch.cat(comp_images[::-1], dim=0),)
+
 
 
 NODE_CLASS_MAPPINGS = {
