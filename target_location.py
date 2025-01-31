@@ -558,7 +558,7 @@ class image_composite_chained:
                 "main_destination" :("IMAGE", ),
                 "sources": ("IMAGE", ),
                 "masks": ("MASK", ),
-                "destination": (["main_destination", "blank_image"],),
+                "destination": (["main_destination", "empty_white_image", "empty_black_image"],),
                 "resize_sources": ("BOOLEAN", {"default": False}),
             }
         }
@@ -572,11 +572,16 @@ class image_composite_chained:
 
     def run(self, main_destination, sources, masks, destination, resize_sources):
 
-        if destination == "blank_image":
+        if destination == "empty_white_image":
             size = get_image_size(main_destination)
             width_B = int(size[0])
             height_B = int(size[1])
             composited_image = create_white(width_B,height_B)
+        elif destination == "empty_black_image":
+            size = get_image_size(main_destination)
+            width_B = int(size[0])
+            height_B = int(size[1])
+            composited_image = create_black(width_B,height_B)
         else:
             composited_image = main_destination
 
