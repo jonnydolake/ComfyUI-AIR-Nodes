@@ -4,6 +4,8 @@ from .target_location import *
 from .match_image_count_to_mask_count import *
 from .paralax_test import *
 from .paralax_gpu_test import *
+from .manga_segmentation import *
+from .mask_fill import *
 
 NODE_CLASS_MAPPINGS = {
     "string_list_to_prompt_schedule": string_list_to_prompt_schedule,
@@ -16,6 +18,8 @@ NODE_CLASS_MAPPINGS = {
     "ParallaxTest": parallax_test,
     "easy_parallax": easy_parallax,
     "ParallaxGPUTest": ParallaxGPUTest,
+    "MangaPanelSegmentationNode": MangaPanelSegmentationNode,
+    "Mask_Fill_Region": Mask_Fill_Region,
 
 }
 
@@ -30,7 +34,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ParallaxTest": "Parallax Test",
     "easy_parallax": "Easy Parallax",
     "ParallaxGPUTest": "Parallax GPU Test",
-
+    "MangaPanelSegmentationNode": "Manga Panel Segmentation Node",
+    "Mask_Fill_Region": "Mask Fill Region",
 
 }
 
