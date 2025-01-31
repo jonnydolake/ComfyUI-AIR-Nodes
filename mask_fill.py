@@ -4,7 +4,8 @@ import torch
 from PIL import Image, ImageOps
 from .target_location import pil2mask
 
-def fill_region(image):
+def fill_region(image, fill_only=True):
+
     # Convert image to grayscale
     image = image.convert("L")
     
@@ -54,10 +55,12 @@ def fill_region(image):
         
         # Combine the results
         combined_filled_mask = np.logical_or(combined_filled_mask, filled_mask == 0)
+        if not fill_only:
+            combined_filled_mask = np.logical_or(combined_filled_mask, binary_mask)
     
     # Convert the combined filled mask back to an image
     filled_image = Image.fromarray(combined_filled_mask.astype(np.uint8) * 255, mode="L")
-    
+
     return ImageOps.invert(filled_image.convert("RGB"))
 
 class Mask_Fill_Region:
@@ -70,6 +73,7 @@ class Mask_Fill_Region:
         return {
             "required": {
                 "masks": ("MASK",),
+                "return_fill_only": ("BOOLEAN", {"default": False}),
             }
         }
 
@@ -78,15 +82,16 @@ class Mask_Fill_Region:
     RETURN_TYPES = ("MASK",)
     RETURN_NAMES = ("MASKS",)
 
-    FUNCTION = "fill_region"
+    FUNCTION = "fill_mask"
 
-    def fill_region(self, masks):
+    def fill_mask(self, masks, return_fill_only):
         if masks.ndim > 3:
             regions = []
             for mask in masks:
                 mask_np = np.clip(255. * mask.cpu().numpy().squeeze(), 0, 255).astype(np.uint8)
                 pil_image = Image.fromarray(mask_np, mode="L")
-                region_mask = fill_region(pil_image)
+                region_mask = fill_region(pil_image, return_fill_only)
+
                 region_tensor = pil2mask(region_mask).unsqueeze(0).unsqueeze(1)
                 regions.append(region_tensor)
             regions_tensor = torch.cat(regions, dim=0)
@@ -94,11 +99,12 @@ class Mask_Fill_Region:
         else:
             mask_np = np.clip(255. * masks.cpu().numpy().squeeze(), 0, 255).astype(np.uint8)
             pil_image = Image.fromarray(mask_np, mode="L")
-            region_mask = fill_region(pil_image)
+            region_mask = fill_region(pil_image, return_fill_only)
+
             region_tensor = pil2mask(region_mask).unsqueeze(0).unsqueeze(1)
             return (region_tensor,)
 
-# Register the node
+
 NODE_CLASS_MAPPINGS = {
     "Mask_Fill_Region": Mask_Fill_Region,
 }
