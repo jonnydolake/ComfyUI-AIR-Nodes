@@ -6,6 +6,8 @@ from .paralax_test import *
 from .paralax_gpu_test import *
 from .manga_segmentation import *
 from .mask_fill import *
+from .line_detection import *
+from .yolo_detect import *
 
 NODE_CLASS_MAPPINGS = {
     "string_list_to_prompt_schedule": string_list_to_prompt_schedule,
@@ -20,6 +22,8 @@ NODE_CLASS_MAPPINGS = {
     "ParallaxGPUTest": ParallaxGPUTest,
     "MangaPanelSegmentationNode": MangaPanelSegmentationNode,
     "Mask_Fill_Region": Mask_Fill_Region,
+    "LineDetection": LineDetection,
+    "Yolov8Detection": Yolov8Detection,
 
 }
 
@@ -36,6 +40,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ParallaxGPUTest": "Parallax GPU Test",
     "MangaPanelSegmentationNode": "Manga Panel Segmentation Node",
     "Mask_Fill_Region": "Mask Fill Region",
+    "LineDetection": "Line Detection",
+    "Yolov8Detection": "Yolov8 Detection",
 
 }
 
