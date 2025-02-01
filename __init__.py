@@ -3,7 +3,6 @@ from .prompt_nodes import *
 from .target_location import *
 from .match_image_count_to_mask_count import *
 from .paralax_test import *
-from .paralax_gpu_test import *
 from .manga_segmentation import *
 from .mask_fill import *
 from .line_detection import *
@@ -19,7 +18,6 @@ NODE_CLASS_MAPPINGS = {
     "RandomCharacterPrompts": random_character_prompts,
     "ParallaxTest": parallax_test,
     "easy_parallax": easy_parallax,
-    "ParallaxGPUTest": ParallaxGPUTest,
     "MangaPanelSegmentationNode": MangaPanelSegmentationNode,
     "Mask_Fill_Region": Mask_Fill_Region,
     "LineDetection": LineDetection,
@@ -37,7 +35,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "RandomCharacterPrompts": "Random Character Prompts",
     "ParallaxTest": "Parallax Test",
     "easy_parallax": "Easy Parallax",
-    "ParallaxGPUTest": "Parallax GPU Test",
     "MangaPanelSegmentationNode": "Manga Panel Segmentation Node",
     "Mask_Fill_Region": "Mask Fill Region",
     "LineDetection": "Line Detection",
