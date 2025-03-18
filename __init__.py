@@ -8,6 +8,7 @@ from .mask_fill import *
 from .line_detection import *
 from .yolo_detect import *
 from .extract_blacks_lines import *
+from .displace_image import *
 
 NODE_CLASS_MAPPINGS = {
     "string_list_to_prompt_schedule": string_list_to_prompt_schedule,
@@ -24,6 +25,7 @@ NODE_CLASS_MAPPINGS = {
     "LineDetection": LineDetection,
     "Yolov8Detection": Yolov8Detection,
     "ExtractBlackLines": extract_lines,
+    "DisplaceImage": displace_image,
 
 }
 
@@ -42,6 +44,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "LineDetection": "Line Detection",
     "Yolov8Detection": "Yolov8 Detection",
     "ExtractBlackLines": "Extract Black Lines",
+    "DisplaceImage": "Displace Image",
 
 }
 
