@@ -48,29 +48,31 @@ class displace_image:
 
         pos_displace = displace_by
         neg_displace = -displace_by
+        ret_images = []
 
-        _image = tensor2pil(image)
+        for img in image:
+            _image = tensor2pil(img)
 
-        image_canvas1 = Image.new('RGB', size=_image.size, color='white')
-        image_canvas2 = Image.new('RGB', size=_image.size, color='white')
-        image_canvas3 = Image.new('RGB', size=_image.size, color='white')
-        image_canvas4 = Image.new('RGB', size=_image.size, color='white')
+            image_canvas1 = Image.new('RGB', size=_image.size, color='white')
+            image_canvas2 = Image.new('RGB', size=_image.size, color='white')
+            image_canvas3 = Image.new('RGB', size=_image.size, color='white')
+            image_canvas4 = Image.new('RGB', size=_image.size, color='white')
 
-        # Composite
-        image_canvas1.paste(_image, (pos_displace, 0))
-        image_canvas2.paste(_image, (neg_displace, 0))
-        image_canvas3.paste(_image, (0, pos_displace))
-        image_canvas4.paste(_image, (0, neg_displace))
+            # Composite
+            image_canvas1.paste(_image, (pos_displace, 0))
+            image_canvas2.paste(_image, (neg_displace, 0))
+            image_canvas3.paste(_image, (0, pos_displace))
+            image_canvas4.paste(_image, (0, neg_displace))
 
-        #Multiply
-        blend1= multiply_blend(image_canvas1,image_canvas2)
-        blend2 = multiply_blend(blend1, image_canvas3)
-        blend3 = multiply_blend(blend2, image_canvas4)
+            #Multiply
+            blend1= multiply_blend(image_canvas1,image_canvas2)
+            blend2 = multiply_blend(blend1, image_canvas3)
+            blend3 = multiply_blend(blend2, image_canvas4)
 
-        ret_image = pil2tensor(blend3)
+            ret_images.append(pil2tensor(blend3))
 
 
-        return (ret_image,)
+        return (torch.cat(ret_images, dim=0),)
 
 
 
