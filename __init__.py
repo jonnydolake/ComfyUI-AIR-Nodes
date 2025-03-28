@@ -26,6 +26,8 @@ NODE_CLASS_MAPPINGS = {
     "Yolov8Detection": Yolov8Detection,
     "ExtractBlackLines": extract_lines,
     "DisplaceImage": displace_image,
+    "GPUTargetLocationCrop": tensor_target_location_crop,
+    "GPUTargetLocationPaste": tensor_target_location_paste,
 
 }
 
@@ -45,6 +47,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Yolov8Detection": "Yolov8 Detection",
     "ExtractBlackLines": "Extract Black Lines",
     "DisplaceImage": "Displace Image",
+    "GPUTargetLocationCrop": "GPU Target Location Crop",
+    "GPUTargetLocationPaste": "GPU Target Location Paste",
 
 }
 
