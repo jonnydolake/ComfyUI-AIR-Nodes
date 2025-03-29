@@ -9,6 +9,7 @@ from .line_detection import *
 from .yolo_detect import *
 from .extract_blacks_lines import *
 from .displace_image import *
+from .LTXV_add_AIR_guide import *
 
 NODE_CLASS_MAPPINGS = {
     "string_list_to_prompt_schedule": string_list_to_prompt_schedule,
@@ -28,6 +29,7 @@ NODE_CLASS_MAPPINGS = {
     "DisplaceImage": displace_image,
     "GPUTargetLocationCrop": tensor_target_location_crop,
     "GPUTargetLocationPaste": tensor_target_location_paste,
+    "LTXVAddGuideAIR": LTXVAddGuideAIR,
 
 }
 
@@ -49,6 +51,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DisplaceImage": "Displace Image",
     "GPUTargetLocationCrop": "GPU Target Location Crop",
     "GPUTargetLocationPaste": "GPU Target Location Paste",
+    "LTXVAddGuideAIR": "LTXV Add Guide AIR",
 
 }
 
