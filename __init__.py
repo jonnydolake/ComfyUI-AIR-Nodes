@@ -10,6 +10,7 @@ from .yolo_detect import *
 from .extract_blacks_lines import *
 from .displace_image import *
 from .brightness_contrast_saturation import *
+from .LTXV_add_AIR_guide import *
 
 NODE_CLASS_MAPPINGS = {
     "string_list_to_prompt_schedule": string_list_to_prompt_schedule,
@@ -31,6 +32,7 @@ NODE_CLASS_MAPPINGS = {
     "GPUTargetLocationCrop": tensor_target_location_crop,
     "GPUTargetLocationPaste": tensor_target_location_paste,
     "BrightnessContrastSaturation": BrightnessContrastSaturation,
+    "LTXVAddGuideAIR": LTXVAddGuideAIR,
 
 }
 
@@ -54,6 +56,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "GPUTargetLocationCrop": "GPU Target Location Crop",
     "GPUTargetLocationPaste": "GPU Target Location Paste",
     "BrightnessContrastSaturation": "Brightness Contrast Saturation",
+    "LTXVAddGuideAIR": "LTXV Add Guide AIR",
 
 }
 
