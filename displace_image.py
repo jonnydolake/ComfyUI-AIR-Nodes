@@ -75,11 +75,60 @@ class displace_image:
         return (torch.cat(ret_images, dim=0),)
 
 
+class torch_displace_image:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(self):
+        return {
+            "required": {
+                "image": ("IMAGE",),
+                "displace_by": ("INT", {"default": 1, "min": 0, "max": 512, "step": 1}),
+            },
+            "optional": {},
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("image",)
+    FUNCTION = 'layer_image_transform'
+    CATEGORY = 'AIR Nodes'
+
+    def layer_image_transform(self, image, displace_by):
+        # Convert displacement to tensor
+        pos_displace = displace_by
+        neg_displace = -displace_by
+
+        # Create shifted versions of the image
+        # Right shift
+        right_shifted = torch.roll(image, shifts=pos_displace, dims=2)
+        right_shifted[:, :, :pos_displace, :] = 1.0  # Fill with white (1.0 in normalized space)
+
+        # Left shift
+        left_shifted = torch.roll(image, shifts=neg_displace, dims=2)
+        left_shifted[:, :, neg_displace:, :] = 1.0  # Fill with white
+
+        # Down shift
+        down_shifted = torch.roll(image, shifts=pos_displace, dims=1)
+        down_shifted[:, :pos_displace, :, :] = 1.0  # Fill with white
+
+        # Up shift
+        up_shifted = torch.roll(image, shifts=neg_displace, dims=1)
+        up_shifted[:, neg_displace:, :, :] = 1.0  # Fill with white
+
+        # Multiply blend all shifted versions
+        # Multiply blend is simply element-wise multiplication in torch
+        blended = right_shifted * left_shifted * down_shifted * up_shifted
+
+        return (blended,)
+
 
 NODE_CLASS_MAPPINGS = {
-    "DisplaceImage": displace_image,
+    "DisplaceImageCPU": displace_image,
+    "DisplaceImageGPU": torch_displace_image,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "DisplaceImage": "Displace Image",
+    "DisplaceImageCPU": "Displace Image CPU",
+    "DisplaceImageGPU": "Displace Image GPU",
 }
