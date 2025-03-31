@@ -657,6 +657,7 @@ class image_composite_chained:
                 "main_destination" :("IMAGE", ),
                 "sources": ("IMAGE", ),
                 "masks": ("MASK", ),
+                "composite_chained": ("BOOLEAN", {"default": True}),
                 "destination": (["main_destination", "empty_white_image", "empty_black_image"],),
                 "resize_sources": ("BOOLEAN", {"default": False}),
             }
@@ -669,7 +670,7 @@ class image_composite_chained:
 
     CATEGORY = "AIR Nodes"
 
-    def run(self, main_destination, sources, masks, destination, resize_sources):
+    def run(self, main_destination, sources, masks, composite_chained, destination, resize_sources):
 
         if destination == "empty_white_image":
             size = get_image_size(main_destination)
@@ -687,10 +688,17 @@ class image_composite_chained:
         source_list = batch_to_list(sources)
         mask_list = mask_to_list(masks)
 
-        for x in range(len(source_list)):
-            composited_image = composite_masked(composited_image, source_list[x], resize_source=resize_sources, mask=mask_list[x])
+        if composite_chained:
+            for x in range(len(source_list)):
+                composited_image = composite_masked(composited_image, source_list[x], resize_source=resize_sources, mask=mask_list[x])
 
-        return (composited_image,)
+            return (composited_image,)
+        else:
+            composited_images = []
+            for x in range(len(source_list)):
+                new_composited_image = composite_masked(composited_image, source_list[x], resize_source=resize_sources, mask=mask_list[x])
+                composited_images.append(new_composited_image)
+            return (list_to_batch(composited_images),)
 
 
 class tensor_target_location_crop:
