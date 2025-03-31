@@ -357,7 +357,8 @@ def tensor_upscale(image_tensor, side_length):
         image_tensor.permute(0, 3, 1, 2),
         size=(new_height, new_width),
         mode='bilinear',
-        align_corners=False
+        align_corners=False,
+        antialias=True
     ).permute(0, 2, 3, 1)
 
     return resized
@@ -619,9 +620,9 @@ class target_location_paste:
         for x in range(len(_images)):
             if cropped_images_scaled[x].size < _images[x].size or cropped_images_scaled[x].size > _images[x].size:
 
-                image_width, image_height = _images[x].size
+                image_width, image_height = cropped_images_scaled[x].size
 
-                temp_image_resized = new_upscale(cropped_images_scaled[x], image_width)
+                temp_image_resized = new_upscale(_images[x], image_width)
 
                 resized_cropped_images[x].paste(temp_image_resized, (0,0))
 
