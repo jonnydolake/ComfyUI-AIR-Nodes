@@ -733,6 +733,8 @@ class tensor_target_location_crop:
         device = images.device
         padding = mask_padding
         size = resolution_size
+        white_square = create_white(resolution_size, resolution_size)
+        black_square = create_black(resolution_size, resolution_size)
 
         # Convert masks to single channel if needed
         if masks.ndim == 4 and masks.shape[3] > 1:
@@ -773,10 +775,12 @@ class tensor_target_location_crop:
                 # Store crop data
                 crop_data.append((global_x1, global_y1, global_x2, global_y2))
 
-            crop_data_tuple = (images, masks, crop_data, True)
+            crop_data_tuple = (images, cropped_images, masks, crop_data, True)
             return (torch.cat(cropped_images, dim=0), torch.cat(cropped_masks, dim=0), crop_data_tuple)
 
         else:
+            original_crop = []
+            original_crop_masks = []
             # Process each image/mask pair individually
             for i in range(batch_size):
                 mask_tensor = masks[i].unsqueeze(0)
@@ -785,17 +789,21 @@ class tensor_target_location_crop:
                 # Crop and resize image
                 img_crop = images[i:i + 1, y1:y2, x1:x2, :]
                 img_crop = tensor_upscale(img_crop, size)
-                cropped_images.append(img_crop)
+                original_crop.append(img_crop)
+                img_crop_scaled = composite_masked(white_square, img_crop)
+                cropped_images.append(img_crop_scaled)
 
                 # Crop and resize mask
                 mask_crop = masks[i:i + 1, y1:y2, x1:x2]
                 mask_crop = tensor_upscale(mask_crop.unsqueeze(-1), size)
-                cropped_masks.append(mask_crop.squeeze(-1))
+                original_crop_masks.append(mask_crop.squeeze(-1))
+                mask_crop_scaled = composite_masked(black_square, mask_crop)
+                cropped_masks.append(image_to_mask(mask_crop_scaled))
 
                 # Store crop data
                 crop_data.append((x1, y1, x2, y2))
 
-            crop_data_tuple = (images, masks, crop_data, False)
+            crop_data_tuple = (images, cropped_masks, get_image_size(cropped_images[0]), original_crop, crop_data, False)
             return (torch.cat(cropped_images, dim=0), torch.cat(cropped_masks, dim=0), crop_data_tuple)
 
 
@@ -819,7 +827,12 @@ class tensor_target_location_paste:
     CATEGORY = "AIR Nodes"
 
     def paste(self, cropped_images, crop_data, apply_masks):
-        original_images, original_masks, crop_info, area_mode = crop_data
+        area_mode = crop_data[-1]
+        if area_mode:
+            original_images, original_cropped_images, original_masks, crop_info, area_mode = crop_data
+        else:
+            original_images, original_crop_masks, crop_size, original_crop, crop_info, area_mode = crop_data
+
         device = original_images.device
         batch_size = cropped_images.shape[0]
         output_images = []
@@ -834,7 +847,7 @@ class tensor_target_location_paste:
             crop_width = x2 - x1
 
             # Determine if we should use blank canvas for all
-            use_blank_canvas = (batch_size > len(original_images))
+            use_blank_canvas = (batch_size > len(original_cropped_images))
 
             for i in range(batch_size):
                 # Always use blank canvas if we have more cropped images than originals
@@ -848,8 +861,10 @@ class tensor_target_location_paste:
                     cropped_images[i:i + 1].permute(0, 3, 1, 2),
                     size=(crop_height, crop_width),
                     mode='bilinear',
-                    align_corners=False
+                    align_corners=False,
+                    antialias=True
                 ).permute(0, 2, 3, 1)
+
 
                 # Paste onto canvas
                 canvas[:, y1:y2, x1:x2, :] = resized_crop
@@ -857,7 +872,8 @@ class tensor_target_location_paste:
                 # Apply mask if not using blank canvas and masks are enabled
                 if not use_blank_canvas and apply_masks and i < len(original_masks):
                     mask = original_masks[i:i + 1].unsqueeze(-1)
-                    canvas = canvas * (1 - mask) + resized_crop * mask
+                    #canvas = canvas * (1 - mask) + resized_crop * mask
+                    canvas = composite_masked(original_images[i:i + 1], canvas, mask=mask)
 
                 output_images.append(canvas)
 
@@ -869,16 +885,37 @@ class tensor_target_location_paste:
                 if i >= len(crop_info):
                     break  # Safety check
 
+                if get_image_size(cropped_images[i:i + 1]) != crop_size:
+                    print('True')
+                    width = int(crop_size[0])
+                    height = int(crop_size[1])
+                    scaled_tensor = torch.nn.functional.interpolate(
+                        cropped_images[i:i + 1].permute(0, 3, 1, 2),
+                        size=(height, width),
+                        mode='bilinear',
+                        align_corners=False,
+                        antialias=True
+                    ).permute(0, 2, 3, 1)
+                else:
+                    scaled_tensor = cropped_images[i:i + 1]
+
+                # Apply mask if requested
+                if apply_masks:
+                    comp_image = composite_masked(original_crop[i], scaled_tensor, mask=original_crop_masks[i])
+                else:
+                    comp_image = composite_masked(original_crop[i], scaled_tensor)
+
                 x1, y1, x2, y2 = crop_info[i]
                 crop_height = y2 - y1
                 crop_width = x2 - x1
 
                 # Resize cropped image to original crop size
                 resized_crop = torch.nn.functional.interpolate(
-                    cropped_images[i:i + 1].permute(0, 3, 1, 2),
+                    comp_image.permute(0, 3, 1, 2),
                     size=(crop_height, crop_width),
                     mode='bilinear',
-                    align_corners=False
+                    align_corners=False,
+                    antialias=True
                 ).permute(0, 2, 3, 1)
 
                 # Paste onto original image
@@ -886,9 +923,9 @@ class tensor_target_location_paste:
                 output[:, y1:y2, x1:x2, :] = resized_crop
 
                 # Apply mask if requested
-                if apply_masks and i < len(original_masks):
+                '''if apply_masks and i < len(original_masks):
                     mask = original_masks[i:i + 1].unsqueeze(-1)
-                    output = output * (1 - mask) + resized_crop * mask
+                    output = output * (1 - mask) + resized_crop * mask'''
 
                 output_images.append(output)
 
