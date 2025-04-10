@@ -9,6 +9,7 @@ from .line_detection import *
 from .yolo_detect import *
 from .extract_blacks_lines import *
 from .displace_image import *
+from .LTXV_add_AIR_guide import *
 from .brightness_contrast_saturation import *
 
 NODE_CLASS_MAPPINGS = {
@@ -30,6 +31,7 @@ NODE_CLASS_MAPPINGS = {
     "DisplaceImageGPU": torch_displace_image,
     "GPUTargetLocationCrop": tensor_target_location_crop,
     "GPUTargetLocationPaste": tensor_target_location_paste,
+    "LTXVAddGuideAIR": LTXVAddGuideAIR,
     "BrightnessContrastSaturation": BrightnessContrastSaturation,
     "JoinStringLists": JoinStringLists,
     "CreateFilenameList": CreateFilenameList,
@@ -55,6 +57,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DisplaceImageGPU": "Displace Image GPU",
     "GPUTargetLocationCrop": "GPU Target Location Crop",
     "GPUTargetLocationPaste": "GPU Target Location Paste",
+    "LTXVAddGuideAIR": "LTXV Add Guide AIR",
     "BrightnessContrastSaturation": "Brightness Contrast Saturation",
     "JoinStringLists": "Join String Lists",
     "CreateFilenameList": "Create Filename List",
