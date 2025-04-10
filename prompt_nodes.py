@@ -143,8 +143,6 @@ class random_character_prompts:
             return (hair, face, torso, hands, legs, feet, body)
 
 
-
-
 class string_list_to_prompt_schedule:
     def __init__(self):
         pass
@@ -180,10 +178,83 @@ class string_list_to_prompt_schedule:
         
         return (prompt_schedule,)
 
-NODE_CLASS_MAPPINGS = {"string_list_to_prompt_schedule": string_list_to_prompt_schedule,
-                       "RandomCharacterPrompts": random_character_prompts,
-                       }
 
-NODE_DISPLAY_NAME_MAPPINGS = {"string_list_to_prompt_schedule": "String List To Prompt Schedule",
-                              "RandomCharacterPrompts": "Random Character Prompts",
-                              }
+class JoinStringLists:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {"string_list1" : ("STRING", {"forceInput": True}),
+                         "string_list2": ("STRING", {"forceInput": True}),
+                         },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    INPUT_IS_LIST = (True, True)
+    OUTPUT_IS_LIST = (True,)
+    FUNCTION = "doit"
+
+    CATEGORY = "AIR Nodes"
+
+    def doit(self, string_list1, string_list2):
+        values = string_list1 + string_list2
+
+        return (values,)
+
+
+class CreateFilenameList:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {"images" : ("IMAGE",),
+                         "pre_text" : ("STRING", {"multiline": False,}),
+                         "app_text": ("STRING", {"multiline": False,}),
+                         "file_type": (["jpeg", "png", "webp"],),
+                         },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    #INPUT_IS_LIST = (True, True)
+    OUTPUT_IS_LIST = (True,)
+    FUNCTION = "doit"
+
+    CATEGORY = "AIR Nodes"
+
+    def doit(self, images, pre_text, app_text, file_type):
+
+        if file_type == "jpeg":
+            f_type = '.jpg'
+
+        elif file_type == "png":
+            f_type = '.png'
+
+        elif file_type == "webp":
+            f_type = '.webp'
+
+
+
+        values = []
+        print(pre_text)
+
+        for x in range(len((images))):
+            name = ''
+            name += pre_text + '-' + str("{:02d}".format(x+1)) + '_' + app_text + f_type
+            print(name)
+            values.append(name)
+
+        print(values)
+
+        return (values,)
+
+NODE_CLASS_MAPPINGS = {
+    "string_list_to_prompt_schedule": string_list_to_prompt_schedule,
+    "RandomCharacterPrompts": random_character_prompts,
+    "JoinStringLists": JoinStringLists,
+    "CreateFilenameList": CreateFilenameList,
+    }
+
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "string_list_to_prompt_schedule": "String List To Prompt Schedule",
+    "RandomCharacterPrompts": "Random Character Prompts",
+    "JoinStringLists": "Join String Lists",
+    "CreateFilenameList": "Create Filename List",
+    }
