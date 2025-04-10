@@ -230,7 +230,6 @@ class CreateFilenameList:
             f_type = '.webp'
 
         values = []
-        print(pre_text)
         
         for x in range(len((images))):
 
@@ -241,8 +240,6 @@ class CreateFilenameList:
                 name += pre_text + '-' + str("{:02d}".format(x+1)) + '_' + app_text + f_type
 
             values.append(name)
-
-        print(values)
 
         return (values,)
 
