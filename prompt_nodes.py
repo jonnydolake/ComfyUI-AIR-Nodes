@@ -206,6 +206,7 @@ class CreateFilenameList:
     def INPUT_TYPES(s):
         return {
             "required": {"images" : ("IMAGE",),
+                         "key_frame" : ("BOOLEAN", {"default": False}),
                          "pre_text" : ("STRING", {"multiline": False,}),
                          "app_text": ("STRING", {"multiline": False,}),
                          "file_type": (["jpeg", "png", "webp"],),
@@ -219,26 +220,26 @@ class CreateFilenameList:
 
     CATEGORY = "AIR Nodes"
 
-    def doit(self, images, pre_text, app_text, file_type):
+    def doit(self, images, key_frame, pre_text, app_text, file_type):
 
         if file_type == "jpeg":
             f_type = '.jpg'
-
         elif file_type == "png":
             f_type = '.png'
-
         elif file_type == "webp":
             f_type = '.webp'
 
-
-
         values = []
         print(pre_text)
-
+        
         for x in range(len((images))):
+
             name = ''
-            name += pre_text + '-' + str("{:02d}".format(x+1)) + '_' + app_text + f_type
-            print(name)
+            if key_frame:
+                name += pre_text + '_' + app_text + f_type
+            else:
+                name += pre_text + '-' + str("{:02d}".format(x+1)) + '_' + app_text + f_type
+
             values.append(name)
 
         print(values)
