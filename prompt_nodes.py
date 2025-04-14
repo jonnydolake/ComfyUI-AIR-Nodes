@@ -242,12 +242,36 @@ class CreateFilenameList:
             values.append(name)
 
         return (values,)
+    
+
+class DetectEvenNumberString:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {"string" : ("STRING", {"forceInput": True}),
+                         },
+        }
+
+    RETURN_TYPES = ("BOOLEAN",)
+    FUNCTION = "doit"
+
+    CATEGORY = "AIR Nodes"
+
+    def doit(self, string):
+        for x in string.strip().split(','):
+            if int(x) % 2 != 0:
+                return (True,)
+        return (False,)
+    
+    
 
 NODE_CLASS_MAPPINGS = {
     "string_list_to_prompt_schedule": string_list_to_prompt_schedule,
     "RandomCharacterPrompts": random_character_prompts,
     "JoinStringLists": JoinStringLists,
     "CreateFilenameList": CreateFilenameList,
+    "DetectEvenNumberString": DetectEvenNumberString,
+
     }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -255,4 +279,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "RandomCharacterPrompts": "Random Character Prompts",
     "JoinStringLists": "Join String Lists",
     "CreateFilenameList": "Create Filename List",
+    "DetectEvenNumberString": "Detect Even Number in String",
     }

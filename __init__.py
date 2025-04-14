@@ -35,6 +35,7 @@ NODE_CLASS_MAPPINGS = {
     "BrightnessContrastSaturation": BrightnessContrastSaturation,
     "JoinStringLists": JoinStringLists,
     "CreateFilenameList": CreateFilenameList,
+    "DetectEvenNumberString": DetectEvenNumberString,
 
 }
 
@@ -61,6 +62,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "BrightnessContrastSaturation": "Brightness Contrast Saturation",
     "JoinStringLists": "Join String Lists",
     "CreateFilenameList": "Create Filename List",
+    "DetectEvenNumberString": "Detect Even Number in String",
 
 }
 
