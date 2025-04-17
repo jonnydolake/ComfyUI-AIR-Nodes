@@ -6,7 +6,6 @@ from .paralax_test import *
 from .manga_segmentation import *
 from .mask_fill import *
 from .line_detection import *
-from .yolo_detect import *
 from .extract_blacks_lines import *
 from .displace_image import *
 from .LTXV_add_AIR_guide import *
@@ -25,7 +24,6 @@ NODE_CLASS_MAPPINGS = {
     "MangaPanelSegmentationNode": MangaPanelSegmentationNode,
     "Mask_Fill_Region": Mask_Fill_Region,
     "LineDetection": LineDetection,
-    "Yolov8Detection": Yolov8Detection,
     "ExtractBlackLines": extract_lines,
     "DisplaceImageCPU": displace_image,
     "DisplaceImageGPU": torch_displace_image,
@@ -52,7 +50,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "MangaPanelSegmentationNode": "Manga Panel Segmentation Node",
     "Mask_Fill_Region": "Mask Fill Region",
     "LineDetection": "Line Detection",
-    "Yolov8Detection": "Yolov8 Detection",
     "ExtractBlackLines": "Extract Black Lines",
     "DisplaceImageCPU": "Displace Image CPU",
     "DisplaceImageGPU": "Displace Image GPU",
