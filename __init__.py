@@ -34,6 +34,7 @@ NODE_CLASS_MAPPINGS = {
     "JoinStringLists": JoinStringLists,
     "CreateFilenameList": CreateFilenameList,
     "DetectEvenNumberString": DetectEvenNumberString,
+    "CombinedInbetweenInputs": CombinedInbetweenInputs,
 
 }
 
@@ -60,6 +61,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "JoinStringLists": "Join String Lists",
     "CreateFilenameList": "Create Filename List",
     "DetectEvenNumberString": "Detect Even Number in String",
+    "CombinedInbetweenInputs": "Combined Inbetween Inputs",
 
 }
 

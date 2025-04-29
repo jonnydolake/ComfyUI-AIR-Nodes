@@ -263,7 +263,25 @@ class DetectEvenNumberString:
                 return (True,)
         return (False,)
     
-    
+
+class CombinedInbetweenInputs:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+            "filename": ("STRING", {"default": 'frame', "multiline": False}),
+            "indexes": ("STRING", {"default": '0,24', "multiline": False}),
+            "reverse": ("BOOLEAN", {"default": False}),
+            "seed": ("INT", {"default": 5, "min": 0, "max": 0xffffffffffffffff}),
+        },
+        }
+    RETURN_TYPES = ("STRING", "STRING", "BOOLEAN", "INT")
+    RETURN_NAMES = ("filename", "indexes", "reverse", "seed")
+    FUNCTION = "get_value"
+    CATEGORY = "AIR Nodes"
+
+    def get_value(self, filename, indexes, reverse, seed):
+        return (filename, indexes, reverse, seed)
+
 
 NODE_CLASS_MAPPINGS = {
     "string_list_to_prompt_schedule": string_list_to_prompt_schedule,
@@ -271,6 +289,7 @@ NODE_CLASS_MAPPINGS = {
     "JoinStringLists": JoinStringLists,
     "CreateFilenameList": CreateFilenameList,
     "DetectEvenNumberString": DetectEvenNumberString,
+    "CombinedInbetweenInputs": CombinedInbetweenInputs,
 
     }
 
@@ -280,4 +299,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "JoinStringLists": "Join String Lists",
     "CreateFilenameList": "Create Filename List",
     "DetectEvenNumberString": "Detect Even Number in String",
+    "CombinedInbetweenInputs": "Combined Inbetween Inputs",
     }
