@@ -268,19 +268,20 @@ class CombinedInbetweenInputs:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {
-            "filename": ("STRING", {"default": 'frame', "multiline": False}),
+            "filename1": ("STRING", {"default": 'frame', "multiline": False}),
+            "filename2": ("STRING", {"default": 'frame', "multiline": False}),
             "indexes": ("STRING", {"default": '0,24', "multiline": False}),
             "reverse": ("BOOLEAN", {"default": False}),
             "seed": ("INT", {"default": 5, "min": 0, "max": 0xffffffffffffffff}),
         },
         }
-    RETURN_TYPES = ("STRING", "STRING", "BOOLEAN", "INT")
-    RETURN_NAMES = ("filename", "indexes", "reverse", "seed")
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "BOOLEAN", "INT")
+    RETURN_NAMES = ("filename1", "filename2", "indexes", "reverse", "seed")
     FUNCTION = "get_value"
     CATEGORY = "AIR Nodes"
 
-    def get_value(self, filename, indexes, reverse, seed):
-        return (filename, indexes, reverse, seed)
+    def get_value(self, filename1, filename2, indexes, reverse, seed):
+        return (filename1, filename2, indexes, reverse, seed)
 
 
 NODE_CLASS_MAPPINGS = {
