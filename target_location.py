@@ -475,6 +475,12 @@ class target_location_crop:
                 right.append(x_right)
                 bottom.append(x_bottom)
 
+            print("normal")
+            print(min(top))
+            print(min(left))
+            print(min(right))
+            print(min(bottom))
+
             for _image in _images:
                 cropped_image = new_image_crop_location(_image, min(top), min(left), max(right), max(bottom))
                 cropped_images.append(cropped_image)
@@ -745,10 +751,41 @@ class tensor_target_location_crop:
         cropped_masks = []
         crop_data = []
 
+        _images = []
+        _masks = []
+
+        for x in range(len(images)):
+            _images.append(tensor2pil(images[x]))
+            _masks.append(tensor2pil(masks[x]))
+
         if area_mode:
             # Find union of all mask regions
-            all_x1, all_y1, all_x2, all_y2 = [], [], [], []
-            for i in range(batch_size):
+            top, left, right, bottom = [], [], [], []
+            for _mask in _masks:
+                x_cropped_mask, x_top, x_left, x_right, x_bottom = new_mask_crop_region(_mask, padding)
+                top.append(x_top)
+                left.append(x_left)
+                right.append(x_right)
+                bottom.append(x_bottom)
+
+                print("tensor")
+                print(min(top))
+                print(min(left))
+                print(min(right))
+                print(min(bottom))
+
+            for _image in _images:
+                cropped_image = new_image_crop_location(_image, min(top), min(left), max(right), max(bottom))
+                cropped_images.append(pil2tensor(new_upscale(cropped_image, size)))
+
+            for _mask in _masks:
+                cropped_mask = new_image_crop_location(_mask, min(top), min(left), max(right), max(bottom))
+                cropped_masks.append(pil2tensor(new_upscale(cropped_mask, size)))
+
+            crop_data.append((min(left), min(top), max(right), max(bottom)))
+
+
+            '''for i in range(batch_size):
                 mask_tensor = masks[i].unsqueeze(0)
                 x1, y1, x2, y2 = tensor_crop_region(mask_tensor, padding)
                 all_x1.append(x1)
@@ -760,6 +797,13 @@ class tensor_target_location_crop:
             global_y1 = min(all_y1)
             global_x2 = max(all_x2)
             global_y2 = max(all_y2)
+
+
+            print("tensor")
+            print(global_x1)
+            print(global_y1)
+            print(global_x2)
+            print(global_y2)
 
             for i in range(batch_size):
                 # Crop image
@@ -773,7 +817,7 @@ class tensor_target_location_crop:
                 cropped_masks.append(mask_crop.squeeze(-1))
 
                 # Store crop data
-                crop_data.append((global_x1, global_y1, global_x2, global_y2))
+                crop_data.append((global_x1, global_y1, global_x2, global_y2))'''
 
             crop_data_tuple = (images, cropped_images, masks, crop_data, True)
             return (torch.cat(cropped_images, dim=0), torch.cat(cropped_masks, dim=0), crop_data_tuple)
