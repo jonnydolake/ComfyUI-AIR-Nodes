@@ -475,12 +475,6 @@ class target_location_crop:
                 right.append(x_right)
                 bottom.append(x_bottom)
 
-            print("normal")
-            print(min(top))
-            print(min(left))
-            print(min(right))
-            print(min(bottom))
-
             for _image in _images:
                 cropped_image = new_image_crop_location(_image, min(top), min(left), max(right), max(bottom))
                 cropped_images.append(cropped_image)
@@ -724,8 +718,8 @@ class tensor_target_location_crop:
             }
         }
 
-    RETURN_TYPES = ("IMAGE", "MASK", "*")
-    RETURN_NAMES = ("cropped_images", "cropped_masks", "crop_data")
+    RETURN_TYPES = ("IMAGE", "MASK", "*", "INT")
+    RETURN_NAMES = ("cropped_images", "cropped_masks", "crop_data", "original_crop_size")
     FUNCTION = "crop"
     CATEGORY = "AIR Nodes"
 
@@ -754,6 +748,8 @@ class tensor_target_location_crop:
         _images = []
         _masks = []
 
+        original_crop_size = 0
+
         for x in range(len(images)):
             _images.append(tensor2pil(images[x]))
             _masks.append(tensor2pil(masks[x]))
@@ -768,14 +764,16 @@ class tensor_target_location_crop:
                 right.append(x_right)
                 bottom.append(x_bottom)
 
-                print("tensor")
-                print(min(top))
-                print(min(left))
-                print(min(right))
-                print(min(bottom))
-
             for _image in _images:
                 cropped_image = new_image_crop_location(_image, min(top), min(left), max(right), max(bottom))
+
+                #get original crop size (we only need the highest value)
+                width, height = cropped_image.size
+                if width > height:
+                    original_crop_size = width
+                else:
+                    original_crop_size = height
+
                 cropped_images.append(pil2tensor(new_upscale(cropped_image, size)))
 
             for _mask in _masks:
@@ -785,42 +783,8 @@ class tensor_target_location_crop:
             crop_data.append((min(left), min(top), max(right), max(bottom)))
 
 
-            '''for i in range(batch_size):
-                mask_tensor = masks[i].unsqueeze(0)
-                x1, y1, x2, y2 = tensor_crop_region(mask_tensor, padding)
-                all_x1.append(x1)
-                all_y1.append(y1)
-                all_x2.append(x2)
-                all_y2.append(y2)
-
-            global_x1 = min(all_x1)
-            global_y1 = min(all_y1)
-            global_x2 = max(all_x2)
-            global_y2 = max(all_y2)
-
-
-            print("tensor")
-            print(global_x1)
-            print(global_y1)
-            print(global_x2)
-            print(global_y2)
-
-            for i in range(batch_size):
-                # Crop image
-                img_crop = images[i:i + 1, global_y1:global_y2, global_x1:global_x2, :]
-                img_crop = tensor_upscale(img_crop, size)
-                cropped_images.append(img_crop)
-
-                # Crop mask
-                mask_crop = masks[i:i + 1, global_y1:global_y2, global_x1:global_x2]
-                mask_crop = tensor_upscale(mask_crop.unsqueeze(-1), size)
-                cropped_masks.append(mask_crop.squeeze(-1))
-
-                # Store crop data
-                crop_data.append((global_x1, global_y1, global_x2, global_y2))'''
-
             crop_data_tuple = (images, cropped_images, masks, crop_data, True)
-            return (torch.cat(cropped_images, dim=0), torch.cat(cropped_masks, dim=0), crop_data_tuple)
+            return (torch.cat(cropped_images, dim=0), torch.cat(cropped_masks, dim=0), crop_data_tuple, original_crop_size)
 
         else:
             original_crop = []
