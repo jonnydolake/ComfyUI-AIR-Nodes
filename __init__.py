@@ -37,6 +37,7 @@ NODE_CLASS_MAPPINGS = {
     "CombinedInbetweenInputs": CombinedInbetweenInputs,
     "JoinImageLists": JoinImageLists,
     "GetImageFromList": GetImageFromList,
+    "RemoveElementFromList": RemoveElementFromList,
 
 }
 
@@ -66,6 +67,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "CombinedInbetweenInputs": "Combined Inbetween Inputs",
     "JoinImageLists": "Join Image Lists",
     "GetImageFromList": "Get Image From List",
+    "RemoveElementFromList": "Remove Element From List",
 
 }
 

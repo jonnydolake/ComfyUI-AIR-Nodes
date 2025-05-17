@@ -91,15 +91,58 @@ class GetImageFromList:
     def get_index(self, image_list, index):
         return (image_list[index[0]],)
 
+    class GetImageFromList:
+        @classmethod
+        def INPUT_TYPES(s):
+            return {
+                "required": {"image_list": ("IMAGE", {"forceInput": True}),
+                             "index": ("INT", {"default": 0, "min": -1024, "max": 1024, "step": 1}),
+                             },
+            }
+
+        RETURN_TYPES = ("IMAGE",)
+        INPUT_IS_LIST = (True,)
+        # OUTPUT_IS_LIST = (False,)
+        FUNCTION = "get_index"
+
+        CATEGORY = "AIR Nodes"
+
+        def get_index(self, image_list, index):
+            return (image_list[index[0]],)
+
+
+class RemoveElementFromList:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {"image_list": ("IMAGE", {"forceInput": True}),
+                         "index": ("INT", {"default": 0, "min": -1024, "max": 1024}),
+                         },
+        }
+
+    RETURN_TYPES = ("IMAGE","IMAGE")
+    RETURN_NAMES = ("image", "new_list")
+    INPUT_IS_LIST = (True,)
+    OUTPUT_IS_LIST = (False, True)
+    FUNCTION = "get_index"
+
+    CATEGORY = "AIR Nodes"
+
+    def get_index(self, image_list, index):
+        new_list = [image_list[x] for x in range(len(image_list)) if x != index[0]]
+        return (image_list[index[0]], new_list)
+
 
 NODE_CLASS_MAPPINGS = {
     "BrightnessContrastSaturation": BrightnessContrastSaturation,
     "JoinImageLists": JoinImageLists,
     "GetImageFromList": GetImageFromList,
+    "RemoveElementFromList": RemoveElementFromList,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "BrightnessContrastSaturation": "Brightness Contrast Saturation",
     "JoinImageLists": "Join Image Lists",
     "GetImageFromList": "Get Image From List",
+    "RemoveElementFromList": "Remove Element From List",
 }
