@@ -9,7 +9,7 @@ from .line_detection import *
 from .extract_blacks_lines import *
 from .displace_image import *
 from .LTXV_add_AIR_guide import *
-from .brightness_contrast_saturation import *
+from .util_nodes import *
 
 NODE_CLASS_MAPPINGS = {
     "string_list_to_prompt_schedule": string_list_to_prompt_schedule,
@@ -35,6 +35,8 @@ NODE_CLASS_MAPPINGS = {
     "CreateFilenameList": CreateFilenameList,
     "DetectEvenNumberString": DetectEvenNumberString,
     "CombinedInbetweenInputs": CombinedInbetweenInputs,
+    "JoinImageLists": JoinImageLists,
+    "GetImageFromList": GetImageFromList,
 
 }
 
@@ -62,6 +64,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "CreateFilenameList": "Create Filename List",
     "DetectEvenNumberString": "Detect Even Number in String",
     "CombinedInbetweenInputs": "Combined Inbetween Inputs",
+    "JoinImageLists": "Join Image Lists",
+    "GetImageFromList": "Get Image From List",
 
 }
 
