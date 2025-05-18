@@ -72,6 +72,56 @@ class JoinImageLists:
         return (values,)
 
 
+class BatchListToFlatList:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {"image" : ("IMAGE",),
+                         #"list2": ("IMAGE", {"forceInput": True}),
+                         },
+        }
+
+    RETURN_TYPES = ("IMAGE", "INT")
+    INPUT_IS_LIST = (True,)
+    OUTPUT_IS_LIST = (True, True)
+    FUNCTION = "execute"
+
+    CATEGORY = "AIR Nodes"
+
+    def execute(self, image):
+        flat_list = []
+        sizes = []
+        for img in image:
+            sizes.append(img.shape[0])
+            flat_list.extend([img[i].unsqueeze(0) for i in range(img.shape[0])])
+        return (flat_list, sizes)
+
+
+class FlatListToBatchList:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {"image" : ("IMAGE",),
+                         "sizes": ("INT", {"forceInput": True}),
+                         },
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    INPUT_IS_LIST = (True,)
+    OUTPUT_IS_LIST = (True,)
+    FUNCTION = "execute"
+
+    CATEGORY = "AIR Nodes"
+
+    def execute(self, image, sizes):
+        batches = []
+        idx = 0
+        for size in sizes:
+            batches.append(torch.cat(image[idx:idx + size], dim=0))  # (B_i, C, H, W)
+            idx += size
+        return (batches,)
+
+
 class GetImageFromList:
     @classmethod
     def INPUT_TYPES(s):
@@ -138,6 +188,8 @@ NODE_CLASS_MAPPINGS = {
     "JoinImageLists": JoinImageLists,
     "GetImageFromList": GetImageFromList,
     "RemoveElementFromList": RemoveElementFromList,
+    "BatchListToFlatList": BatchListToFlatList,
+    "FlatListToBatchList": FlatListToBatchList,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -145,4 +197,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "JoinImageLists": "Join Image Lists",
     "GetImageFromList": "Get Image From List",
     "RemoveElementFromList": "Remove Element From List",
+    "BatchListToFlatList": "Batch List To Flat List",
+    "FlatListToBatchList": "Flat List To Batch List",
 }

@@ -38,6 +38,8 @@ NODE_CLASS_MAPPINGS = {
     "JoinImageLists": JoinImageLists,
     "GetImageFromList": GetImageFromList,
     "RemoveElementFromList": RemoveElementFromList,
+    "BatchListToFlatList": BatchListToFlatList,
+    "FlatListToBatchList": FlatListToBatchList,
 
 }
 
@@ -68,6 +70,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "JoinImageLists": "Join Image Lists",
     "GetImageFromList": "Get Image From List",
     "RemoveElementFromList": "Remove Element From List",
+    "BatchListToFlatList": "Batch List To Flat List",
+    "FlatListToBatchList": "Flat List To Batch List",
 
 }
 
